@@ -233,7 +233,7 @@ void lcd_set_address(unsigned char y){
     _lcd_enable();
 }
 
-/*Write a byte iat the spe*/
+/*Write a byte at the specified page and column*/
 void lcd_draw(unsigned char page, unsigned char y, unsigned char symbol){
     //TODO (julien 16/12/2015) check if set address is necessary when y == currentY
     lcd_set_page(page);

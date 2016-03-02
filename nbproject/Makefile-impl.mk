@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=glcd
+PROJECTNAME=glcd_Average
 
 # Active Configuration
 DEFAULTCONF=default
