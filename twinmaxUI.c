@@ -95,14 +95,21 @@ void tui_draw_number(unsigned char page, unsigned char y, unsigned short val) {
     tui_write_at(page, y, string, 0, 0);
 }
 
-void tui_battery() {
-    // unsigned char val
-    //    glcd_smallNumberAt(0,120,val/10,1);
-    //    glcd_smallNumberAt(0,124,val%10,1)
-
+void tui_battery(unsigned short val) {
+    /*
     int i = 0;
     unsigned char t;
     unsigned char fillMeter = 0b11111100; //<< (5 - val / 20);
+    lcd_draw(0, 120, battery[i]);
+    for (i = 1; i < 6; i++) {
+        t = (unsigned char) (battery[i] | fillMeter);
+        lcd_write(t);
+    }
+    */
+    int i = 0;
+    unsigned char t;
+    unsigned short lvl = ((val - 1638)/160)+1;
+    unsigned char fillMeter = 0b11111100 << (5 - lvl);
     lcd_draw(0, 120, battery[i]);
     for (i = 1; i < 6; i++) {
         t = (unsigned char) (battery[i] | fillMeter);
