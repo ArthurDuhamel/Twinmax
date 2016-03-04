@@ -1,6 +1,7 @@
 #include "twinmaxUI.h" 
 #include "params.h"
 #include "engine.h"
+#include "glcd.h"
 //#ifndef LOGO_H
 //#include "logo.h"
 //#endif
@@ -22,27 +23,6 @@ void tui_draw_graph(unsigned char height[4], int referenceIndex) {
     lcd_draw_bar(3, height[3], referenceIndex == 3);
 #endif
 }
-
-/*
-void tui_menuItem(int index, const char *string, unsigned char highlighted){
-    char i = 0;
-    unsigned char x = index;
-    unsigned char y = 0;
-    while (string[i] != 0 && i < 10){
-        //start new line if address is at the end of the screen
-        if(y +FONT_WIDTH > 64){
-            return;
-        }
-        if(highlighted == 1){
-           lcd_draw_reversed_char(x, y, string[i++]);
-        }
-        else{
-           lcd_draw_char(x, y, string[i++]);
-        }
-        y+= FONT_WIDTH;
-    }
-}
- */
 
 void tui_write_at(unsigned char page, unsigned char y, const char* string, int reversed, int width) {
     int i = 0;
@@ -115,13 +95,14 @@ void tui_draw_number(unsigned char page, unsigned char y, unsigned short val) {
     tui_write_at(page, y, string, 0, 0);
 }
 
-void tui_battery(unsigned char val) {
+void tui_battery() {
+    // unsigned char val
     //    glcd_smallNumberAt(0,120,val/10,1);
     //    glcd_smallNumberAt(0,124,val%10,1)
 
     int i = 0;
     unsigned char t;
-    unsigned char fillMeter = 0b11111100 << (5 - val / 20);
+    unsigned char fillMeter = 0b11111100; //<< (5 - val / 20);
     lcd_draw(0, 120, battery[i]);
     for (i = 1; i < 6; i++) {
         t = (unsigned char) (battery[i] | fillMeter);
