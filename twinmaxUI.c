@@ -92,7 +92,6 @@ void tui_displayMeasures(unsigned short measures[4], unsigned short reference, u
         if (temp <= 0) {
             temp = 0;
         }
-
         // store the value for display
         height[i] = (unsigned char) temp;
     }
@@ -128,5 +127,4 @@ void tui_battery(unsigned char val) {
         t = (unsigned char) (battery[i] | fillMeter);
         lcd_write(t);
     }
-
 }

@@ -218,6 +218,7 @@ void pwm_init() {
 }
 
 void pwm_set(int level) {
+    /* Définit les différents niveau de la PWM pour le backlight */
     if (level == 0) {
         CCP5RB = 0xFFFF;
     }
@@ -326,7 +327,6 @@ void engine_initialization() {
     averages_init();
     adc_init();
     lcd_clear_screen();
-
     engine_start();
 }
 
@@ -357,6 +357,14 @@ void engine_start() {
             vals[i] = weightedAverages[i] + sensor_offsets[i];
         }
         tui_displayMeasures(vals, pression_reference, pression_range, reference_sensor);
+        
+        /* Placer ici l'affichage du niveau de batterie 
+         
+         
+         
+         
+         */
+        
         delay_ms(100);
     }
 }

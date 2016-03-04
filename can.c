@@ -3,10 +3,10 @@
 #include "inputs.h"
 void adc_init(){
            
-    // Set analog inputs for sensors
+    // Set analog inputs for sensors (& battery ?)
     ANSA =  ANSA || 0b0000000000010011;
     ANSB =  ANSB || 0b1111000000000000;
-    ANSC =  ANSC || 0b0000000000000001;
+    ANSC =  ANSC || 0b0000000000000011; // Modifié (ancien : 0b 0000 0000 0000 0001 )
     
     AD1CON1bits.ADON = 0; //Disable CAN for configuration
     AD1CON1bits.ADSIDL = 1; //Stop when in idle mode
@@ -41,29 +41,30 @@ void adc_init(){
     
     AD1CHS = 0b0001111000011110; //Set Vss and AVdd as references
     
-    //select input pins
+    // Select input pins
     /*
-     * RB12 = capteur1 =         AN12
-     RB13 = capteur moyenne 1 = an11
-     RB14 = capteur 2 =         an10
-     RB15 = capteur 2 moyenne =  an9
-     RA0 = capteur 3  =          an0
-     RA1 = capteur 3 moyenne =   an1
-     RC0 = capteur 4  =          an6
-     RA4 = capteur 4 moyenne =   an16
+     * RB12 = capteur 1          =  AN12
+     * RB13 = capteur 1 moyenne  =  AN11
+     * RB14 = capteur 2          =  AN10
+     * RB15 = capteur 2 moyenne  =  AN9
+     * RA0  = capteur 3          =  AN0
+     * RA1  = capteur 3 moyenne  =  AN1
+     * RC0  = capteur 4          =  AN6
+     * RA4  = capteur 4 moyenne  =  AN16
+     * RC1(PIN26) = Batterie     =  AN7
      */
 
     AD1CSSL = 0b0001111001000011;
     AD1CSSH = 0b0000000000000001;
     
-    IFS0bits.AD1IF = 0 ; //reset interrupt flag
-    IEC0bits.AD1IE = 1; //enable interrupt    
-    IPC3bits.AD1IP = 0b100; //interrupt priority set to 4    
-    AD1CON1bits.ADON = 1; //Enable CAN
+    IFS0bits.AD1IF = 0 ; // Reset interrupt flag
+    IEC0bits.AD1IE = 1; // Enable interrupt    
+    IPC3bits.AD1IP = 0b100; // Interrupt priority set to 4    
+    AD1CON1bits.ADON = 1; // Enable CAN
 }
 
 void adc_launch(){
-    // Launch the 8 conversions
+    // Launch the 8 (9 w/ battery) conversions
     AD1CON1bits.ASAM = 1;
 }
 
@@ -74,11 +75,11 @@ void __attribute__((__interrupt__,__auto_psv__)) _ADC1Interrupt(void){
     AD1CON1bits.ASAM = 0;
     IFS0bits.AD1IF = 0 ; //reset interrupt flag
 
-    // add the new values in the average
     // average_add_value(average1, SENSOR4BUF);
     // average_add_value(average2, SENSOR3BUF);
 
-    average_add_values(SENSOR1AVGBUF, SENSOR2AVGBUF, SENSOR3AVGBUF, SENSOR4AVGBUF);
+    //average_add_values(SENSOR1AVGBUF, SENSOR2AVGBUF, SENSOR3AVGBUF, SENSOR4AVGBUF);  
+    average_add_values(SENSOR4AVGBUF, SENSOR3AVGBUF, SENSOR2AVGBUF, SENSOR1AVGBUF);
     
     ble_send();
 }

@@ -57,9 +57,17 @@ unsigned short average_get_average(struct movingAverage * average){
 
 
 void average_add_values(unsigned short value1, unsigned short value2, unsigned short value3, unsigned short value4){
+    /* (unsigned short value1, unsigned short value2, unsigned short value3, unsigned short value4) */
     extern struct movingAverage * movingAverages[4];
     average_add_value(movingAverages[0], value1);
     average_add_value(movingAverages[1], value2);
     average_add_value(movingAverages[2], value3);
     average_add_value(movingAverages[3], value4);
+    
+    /*
+    average_add_value(movingAverages[0], value1);
+    average_add_value(movingAverages[1], value2);
+    average_add_value(movingAverages[2], value3);
+    average_add_value(movingAverages[3], value4);
+     */
 }

@@ -159,7 +159,6 @@ void lcd_write(unsigned char data){
     LCD_DATA = data;
     _lcd_enable();
     currentY++;
-    
 }
 
 /*Handles the case when writing cause y register to reach midle of screen*/
@@ -316,10 +315,10 @@ void lcd_draw_bar(unsigned char index, unsigned char value, int isReference){
 void lcd_draw_char(unsigned char page, unsigned char y, char c){
     int i,charIndex;    
     charIndex = c;
-    lcd_draw(page,y,myfont[charIndex][0]);
+    lcd_draw(page, y, myfont[charIndex][0]);
     y++;
     for(i = 1; i <= FONT_WIDTH; i++){ 
-        lcd_draw(page,y,myfont[charIndex][i]);
+        lcd_draw(page, y, myfont[charIndex][i]);
         y++;
     }
 }

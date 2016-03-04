@@ -93,11 +93,6 @@ int main(void) {
     POWER_CIRCUIT_ENABLE = 1 ; //ALMIENTATION ENABLE
     //tui_writeAt(3,20,"COUCOU LES LOULOUS",0,0);
     
-    
     engine_initialization();
-    
-   
-    
-
     return 1;
 }
