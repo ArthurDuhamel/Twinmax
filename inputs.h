@@ -9,7 +9,7 @@
 #define BACKLIGHT_BUTTON PORTAbits.RA3
 
 
-/*ADC BUFFERS */
+/* ADC BUFFERS */
 /* NB : les buffers et les capteurs semblent inversés pour des raisons
  * d'affichage des barres à l'écran, le capteur 1 étant à gauche sur le 
  * prototype.
