@@ -11,6 +11,10 @@
 #include "params.h"
 #include "inputs.h"
 #include "headers.h"
+#include "bluetooth.h"
+
+
+
 
 enum engine_phase {
     INIT,
@@ -18,8 +22,227 @@ enum engine_phase {
     SLEEP
 };
 
+
 volatile int is_blueetooth_enable;
 volatile enum engine_phase phase = INIT;
+
+void pwm_set(int level) {
+    /* Définit les différents niveau de la PWM pour le backlight */
+    if (level == 0) {
+        CCP5RB = 0xFFFF;
+    }
+    if (level == 1) {
+        CCP5RB = 0x8888;
+    }
+    if (level == 2) {
+        CCP5RB = 0x00;
+    }
+}
+
+void button_light_interupt() {
+    extern int backlight_level;
+    backlight_level = (backlight_level + 1) % 3;
+    pwm_set(backlight_level);
+    delay_ms(200);
+    return;
+}
+
+void button_power_interupt() {
+    if (phase == SLEEP) {
+        phase = INIT;
+        delay_ms(200);
+    } else {
+        //TODO changer les registres ECN pour désactiver les interruptions autres que le buton pwoer
+        CNEN1 = 0;
+        CNEN2 = 0b0100000000000000; // Only keep power button interrupt
+        CNEN3 = 0;
+        phase = SLEEP;
+        timer_stop();
+        lcd_clear_screen();
+        tui_write_at(3, 40, BYE, 0, 0);
+        delay_ms(1000);
+        //PORTA = 0;
+        //PORTB = 0;
+        //LATC = 0;
+        //lcd_off();
+
+        /* Ajouté pour corriger la conso */
+        CS2 = CSLOW;
+        RESET = 0;
+        DI = 0;
+
+        //OSCCONbits.CLKLOCK;
+
+        POWER_CIRCUIT_ENABLE = 0;
+        IFS1bits.CNIF = 0;
+        Sleep();
+    }
+    return;
+}
+
+
+
+void __attribute__((__interrupt__, auto_psv))_ISR _U1RXInterrupt(void) {
+    char buffer[8];
+    int i = 0;
+    extern int isConnected;
+    extern int rxState;
+    U1TXREG = isConnected;
+    if(U1STAbits.OERR == 1) {
+        U1STAbits.OERR = 0;
+    }
+    while(U1STAbits.URXDA == 1) {
+        if(i<8) {
+           buffer[i] = U1RXREG;
+        }
+        i++;
+    }
+    switch(rxState) {
+        case 0:
+            if(buffer[0] == 'O') {
+                rxState = 1;
+            } else {
+                rxState = 0;
+            }
+            break;
+        case 1:
+            if(buffer[0] == 'K') {
+                rxState = 2;
+            } else {
+                rxState = 0;
+            }
+            break;
+        case 2:
+            if(buffer[0] == '+') {
+                rxState = 3;
+            } else {
+                rxState = 0;
+            }
+            break;
+        case 3:
+            if(buffer[0] == 'C') {
+                rxState = 4;
+            } else if (buffer[0] == 'L') {
+                rxState = 7;
+            } else {
+                rxState = 0;
+            }
+            break;
+        case 4:
+            if(buffer[0] == 'O') {
+                rxState = 5;
+            } else {
+                rxState = 0;
+            }
+            break;
+        case 5:
+            if(buffer[0] == 'N') {
+                rxState = 6;
+            } else {
+                rxState = 0;
+            }
+            break;
+        case 6:
+            if(buffer[0] == 'N') {
+                rxState = 0;
+                isConnected = 0xFF;
+            } else {
+                rxState = 0;
+            }
+            break;
+        case 7:
+            if(buffer[0] == 'O') {
+                rxState = 8;
+            } else {
+                rxState = 0;
+            }
+            break;
+        case 8:
+            if(buffer[0] == 'S') {
+                rxState = 9;
+            } else {
+                rxState = 0;
+            }
+            break;
+        case 9:
+            if(buffer[0] == 'T') {
+                rxState = 0;
+                isConnected = 0xFF;
+            } else {
+                rxState = 0;
+            }
+            break;
+    }
+    //isConnected = 0xFF;
+    //Clear flag !
+    IFS0bits.U1RXIF = 0;
+    
+}
+
+void __attribute__((__interrupt__, auto_psv))_ISR _U1TXInterrupt(void){
+    ble_send();
+    IFS0bits.U1TXIF=0b0;// remise à 0 du flag
+    return;
+  } // end interrupt
+
+
+void set_scale(unsigned short new_reference, unsigned short new_range) {
+    extern unsigned short pression_range;
+    extern unsigned short pression_reference;
+    int new_reference_pressure = measure_to_pressure(new_reference);
+    int new_range_pressure = measure_to_pressure(new_range);
+
+    if (new_reference_pressure - new_range_pressure / 2 <= 0) {
+        new_reference = new_range / 2;
+    }
+
+    pression_reference = new_reference;
+
+    if (new_range <= MAX_RANGE && new_range >= MIN_RANGE) {
+        pression_range = new_range;
+    }
+    return;
+}
+
+void button_select_interupt() {
+    extern unsigned short reference_sensor;
+    extern unsigned short weightedAverages[4];
+    extern unsigned short pression_range;
+    set_scale(weightedAverages[reference_sensor], pression_range);
+    delay_ms(200);
+    return;
+}
+
+void button_right_interupt() {
+    extern unsigned short reference_sensor;
+    extern unsigned short weightedAverages[4];
+    extern unsigned short pression_range;
+    set_scale(weightedAverages[reference_sensor], pression_range / RANGE_STEP);
+    delay_ms(200);
+    return;
+}
+
+void button_left_interupt() {
+    extern unsigned short reference_sensor;
+    extern unsigned short weightedAverages[4];
+    extern unsigned short pression_range;
+    set_scale(weightedAverages[reference_sensor], pression_range * RANGE_STEP);
+    delay_ms(200);
+    return;
+}
+
+void button_calibration_interrupt() {
+    delay_ms(500);
+    average_update_weighted_averages();
+    extern unsigned short reference_sensor;
+    extern unsigned short weightedAverages[4];
+    extern int sensor_offsets[4];
+    int i;
+
+    for (i = 0; i < 4; i++) {
+        sensor_offsets[i] = weightedAverages[reference_sensor] - weightedAverages[i];
+    }
+}
 
 void __attribute__((__interrupt__, __auto_psv__)) _CNInterrupt(void) {
 
@@ -44,6 +267,67 @@ void __attribute__((__interrupt__, __auto_psv__)) _CNInterrupt(void) {
     IFS1bits.CNIF = 0;
 
     return;
+}
+
+
+
+void engine_start() {
+    extern unsigned short weightedAverages[4];
+    extern unsigned short pression_range;
+    extern unsigned short pression_reference;
+    extern unsigned short reference_sensor;
+    extern int sensor_offsets[4];
+    pression_range = MAX_RANGE;
+    unsigned short vals[4];
+    int i = 0;
+    phase = RUN;
+
+    timer_start();
+
+    for (i = 0; i < 10; i++) {
+        average_update_weighted_averages();
+        delay_ms(10);
+    }
+
+    average_update_weighted_averages();
+    pression_reference = weightedAverages[reference_sensor];
+
+    int c = 0;
+    unsigned short batteryLevel = 0;
+    unsigned short memory = BATTERYLEVEL; // A ameliorer en faisant une petite moyenne avant, afin d'éviter les sursauts au démarrage.
+    unsigned short sensorLevel = 0;
+    unsigned short memorySensor;
+    
+    while (phase == RUN) {
+
+        average_update_weighted_averages();
+        for (i = 0; i < 4; i++) {
+            vals[i] = weightedAverages[i] + sensor_offsets[i];
+        }
+        tui_displayMeasures(vals, pression_reference, pression_range, reference_sensor);
+        
+        tui_battery(memory);
+        batteryLevel = batteryLevel + BATTERYLEVEL;
+        c++;
+        if (c == 20) {
+            memory = batteryLevel / 20;
+            batteryLevel = 0;
+            c = 0;
+        }
+                
+        // SENSOR4AVGBUF
+        /*sensorLevel = sensorLevel + SENSOR4AVGBUF;
+        c++;
+        if (c == 20) {
+            memorySensor = sensorLevel / 20;
+            sensorLevel = 0;
+            c = 0;
+        }
+        */
+        tui_draw_number(0, 60, weightedAverages[0]);
+        
+        delay_ms(100);
+    }
 }
 
 void init_button_interrupt() {
@@ -90,162 +374,6 @@ void init_button_interrupt() {
     CNEN3 = 0b0000000000011100;
 }
 
-void set_scale(unsigned short new_reference, unsigned short new_range) {
-    extern unsigned short pression_range;
-    extern unsigned short pression_reference;
-    int new_reference_pressure = measure_to_pressure(new_reference);
-    int new_range_pressure = measure_to_pressure(new_range);
-
-    if (new_reference_pressure - new_range_pressure / 2 <= 0) {
-        new_reference = new_range / 2;
-    }
-
-    pression_reference = new_reference;
-
-    if (new_range <= MAX_RANGE && new_range >= MIN_RANGE) {
-        pression_range = new_range;
-    }
-    return;
-}
-
-void button_left_interupt() {
-    extern unsigned short reference_sensor;
-    extern unsigned short weightedAverages[4];
-    extern unsigned short pression_range;
-    set_scale(weightedAverages[reference_sensor], pression_range * RANGE_STEP);
-    delay_ms(200);
-    return;
-}
-
-void button_right_interupt() {
-    extern unsigned short reference_sensor;
-    extern unsigned short weightedAverages[4];
-    extern unsigned short pression_range;
-    set_scale(weightedAverages[reference_sensor], pression_range / RANGE_STEP);
-    delay_ms(200);
-    return;
-}
-
-void button_select_interupt() {
-    extern unsigned short reference_sensor;
-    extern unsigned short weightedAverages[4];
-    extern unsigned short pression_range;
-    set_scale(weightedAverages[reference_sensor], pression_range);
-    delay_ms(200);
-    return;
-}
-
-void button_light_interupt() {
-    extern int backlight_level;
-    backlight_level = (backlight_level + 1) % 3;
-    pwm_set(backlight_level);
-    delay_ms(200);
-    return;
-}
-
-void button_power_interupt() {
-    if (phase == SLEEP) {
-        phase = INIT;
-        delay_ms(200);
-    } else {
-        //TODO changer les registres ECN pour désactiver les interruptions autres que le buton pwoer
-        CNEN1 = 0;
-        CNEN2 = 0b0100000000000000; // Only keep power button interrupt
-        CNEN3 = 0;
-        phase = SLEEP;
-        timer_stop();
-        lcd_clear_screen();
-        tui_write_at(3, 40, BYE, 0, 0);
-        delay_ms(1000);
-        //PORTA = 0;
-        //PORTB = 0;
-        //LATC = 0;
-        //lcd_off();
-        
-        /* Ajouté pour corriger la conso */
-        CS2 = CSLOW;
-        RESET = 0;
-        DI = 0; 
-        
-        //OSCCONbits.CLKLOCK;
-        
-        POWER_CIRCUIT_ENABLE = 0;
-        IFS1bits.CNIF = 0;
-        Sleep();
-    }
-    return;
-}
-
-void button_calibration_interrupt() {
-    delay_ms(500);
-    average_update_weighted_averages();
-    extern unsigned short reference_sensor;
-    extern unsigned short weightedAverages[4];
-    extern int sensor_offsets[4];
-    int i;
-
-    //    sensor_offsets[0] = 0;
-    //    sensor_offsets[1] = SENSOR1AVGBUF - SENSOR2AVGBUF;
-    //    sensor_offsets[2] = SENSOR1AVGBUF - SENSOR3AVGBUF;
-    //    sensor_offsets[3] = SENSOR1AVGBUF - SENSOR4AVGBUF;
-
-    for (i = 0; i < 4; i++) {
-        sensor_offsets[i] = weightedAverages[reference_sensor] - weightedAverages[i];
-    }
-}
-
-void pwm_init() {
-    CCP5CON1Lbits.CCSEL = 0; //MCCP operting mode
-    CCP5CON1Lbits.MOD = 0b0101; // Set mode (Buffered Dual-Compare/PWM mode)
-
-    CCP5CON1Lbits.TMR32 = 0; // Set timebase width (16-bit)
-    CCP5CON1Lbits.TMRSYNC = 0; // Set timebase synchronization (Synchronized) 
-    CCP5CON1Lbits.CLKSEL = 0b000; // Set the clock source (Tcy)
-    CCP5CON1Lbits.TMRPS = 0b00; // Set the clock pre-scaler (1:1)
-
-    CCP5CON1Hbits.TRIGEN = 0; // Set Sync/Triggered mode (Synchronous)
-    CCP5CON1Hbits.SYNC = 0b00000; // Select Sync/Trigger source (Self-sync)
-
-    CCP5CON2Hbits.OCAEN = 1;
-    CCP5CON3Hbits.POLACE = 0;
-    CCP5CON3Hbits.PSSACE = 0b10; //pins driven inactive on shutdown
-
-    CCP5TMRL = 0x0000;
-    CCP5PRL = 0xFFFF;
-    CCP5RA = 0x0000;
-    CCP5RB = 0x0000;
-    CCP5CON1Lbits.CCPON = 1; // Turn on MCCP module
-}
-
-void pwm_set(int level) {
-    /* Définit les différents niveau de la PWM pour le backlight */
-    if (level == 0) {
-        CCP5RB = 0xFFFF;
-    }
-    if (level == 1) {
-        CCP5RB = 0x8888;
-    }
-    if (level == 2) {
-        CCP5RB = 0x00;
-    }
-}
-
-void engine_splash() {
-    lcd_on();
-    lcd_clear_screen();
-    lcd_on();
-    lcd_bitmap(twinmaxLogo);
-    delay_ms(4000);
-    lcd_clear_screen();
-    lcd_on();
-}
-
-void engine_display_bluetooth_question() {
-    tui_write_at(1, 15, BLUETOOTH, 0, 0);
-    tui_write_at(5, 10, YES, is_blueetooth_enable == 0, 0);
-    tui_write_at(5, 90, NO, is_blueetooth_enable == 1, 0);
-}
-
 void engine_display_reference_question(int reference_sensor) {
     tui_write_at(1, 15, REFERENCE, 0, 0);
     tui_write_at(5, 5, "1", reference_sensor == 0, 0);
@@ -254,25 +382,6 @@ void engine_display_reference_question(int reference_sensor) {
     tui_write_at(5, 65, "3", reference_sensor == 2, 0);
     tui_write_at(5, 95, "4", reference_sensor == 3, 0);
 #endif
-}
-
-int engine_ask_for_bluetooth() {
-    int selected = 0;
-
-    while (selected == 0) {
-        engine_display_bluetooth_question(is_blueetooth_enable);
-        while ((LEFT_BUTTON || SELECTION_BUTTON || RIGHT_BUTTON) == 0) {
-        }
-        if (LEFT_BUTTON == 1) {
-            is_blueetooth_enable = (is_blueetooth_enable + 1) % 2;
-        } else if (RIGHT_BUTTON == 1) {
-            is_blueetooth_enable = (is_blueetooth_enable + 1) % 2;
-        } else {
-            selected = 1;
-        }
-        delay_ms(200);
-    }
-    return is_blueetooth_enable;
 }
 
 int engine_ask_for_reference_sensor() {
@@ -295,32 +404,101 @@ int engine_ask_for_reference_sensor() {
     return (int) reference;
 }
 
+void engine_display_bluetooth_question() {
+    tui_write_at(1, 15, BLUETOOTH, 0, 0);
+    tui_write_at(5, 10, YES, is_blueetooth_enable == 0, 0);
+    tui_write_at(5, 90, NO, is_blueetooth_enable == 1, 0);
+}
+
+int engine_ask_for_bluetooth() {
+    int selected = 0;
+
+    while (selected == 0) {
+        engine_display_bluetooth_question(is_blueetooth_enable);
+        while ((LEFT_BUTTON || SELECTION_BUTTON || RIGHT_BUTTON) == 0) {
+        }
+        if (LEFT_BUTTON == 1) {
+            is_blueetooth_enable = (is_blueetooth_enable + 1) % 2;
+        } else if (RIGHT_BUTTON == 1) {
+            is_blueetooth_enable = (is_blueetooth_enable + 1) % 2;
+        } else {
+            selected = 1;
+        }
+        delay_ms(200);
+    }
+    return is_blueetooth_enable;
+}
+
 void engine_menu() {
     // Temporaly disable button interruption
     IEC1bits.CNIE = 0;
     extern unsigned short reference_sensor;
+    extern int isConnected;
+    extern int rxState;
+    extern int canSend;
 
-    if (engine_ask_for_bluetooth() == 1) {
+    /*if (engine_ask_for_bluetooth() == 1) {
         ble_init();
-    }
-
+    }*/
+    
+    /*
+     TEST
+     */
+    
+    ble_init();
+    isConnected = 0x00;
+    rxState = 0;
+    canSend = 0;
+    
+    
     lcd_clear_screen();
     reference_sensor = engine_ask_for_reference_sensor();
     lcd_clear_screen();
 }
 
-void engine_initialization() {
+void pwm_init() {
+    CCP5CON1Lbits.CCSEL = 0; //MCCP operting mode
+    CCP5CON1Lbits.MOD = 0b0101; // Set mode (Buffered Dual-Compare/PWM mode)
 
+    CCP5CON1Lbits.TMR32 = 0; // Set timebase width (16-bit)
+    CCP5CON1Lbits.TMRSYNC = 0; // Set timebase synchronization (Synchronized) 
+    CCP5CON1Lbits.CLKSEL = 0b000; // Set the clock source (Tcy)
+    CCP5CON1Lbits.TMRPS = 0b00; // Set the clock pre-scaler (1:1)
+
+    CCP5CON1Hbits.TRIGEN = 0; // Set Sync/Triggered mode (Synchronous)
+    CCP5CON1Hbits.SYNC = 0b00000; // Select Sync/Trigger source (Self-sync)
+
+    CCP5CON2Hbits.OCAEN = 1;
+    CCP5CON3Hbits.POLACE = 0;
+    CCP5CON3Hbits.PSSACE = 0b10; //pins driven inactive on shutdown
+
+    CCP5TMRL = 0x0000;
+    CCP5PRL = 0xFFFF;
+    CCP5RA = 0x0000;
+    CCP5RB = 0xFFFF; // CHANJAY
+    CCP5CON1Lbits.CCPON = 1; // Turn on MCCP module
+}
+
+void engine_splash() {
+    lcd_on();
+    lcd_clear_screen();
+    lcd_on();
+    lcd_bitmap(twinmaxLogo);
+    delay_ms(4000);
+    lcd_clear_screen();
+    lcd_on();
+}
+
+void engine_initialization() {
+    pwm_init();
     POWER_CIRCUIT_ENABLE = 1; //ALIMENTATION ENABLE
     delay_ms(1500);
+    
     engine_splash();
     // Initialise sleeping options
     RCONbits.RETEN = 1;
     RCONbits.PMSLP = 0;
-    pwm_init();
-
-
-
+    
     engine_menu();
     delay_ms(650);
     init_button_interrupt();
@@ -328,43 +506,4 @@ void engine_initialization() {
     adc_init();
     lcd_clear_screen();
     engine_start();
-}
-
-void engine_start() {
-    extern unsigned short weightedAverages[4];
-    extern unsigned short pression_range;
-    extern unsigned short pression_reference;
-    extern unsigned short reference_sensor;
-    extern int sensor_offsets[4];
-    pression_range = MAX_RANGE;
-    unsigned short vals[4];
-    int i = 0;
-    phase = RUN;
-
-    timer_start();
-
-    for (i = 0; i < 10; i++) {
-        average_update_weighted_averages();
-        delay_ms(10);
-    }
-
-    average_update_weighted_averages();
-    pression_reference = weightedAverages[reference_sensor];
-
-    while (phase == RUN) {
-        average_update_weighted_averages();
-        for (i = 0; i < 4; i++) {
-            vals[i] = weightedAverages[i] + sensor_offsets[i];
-        }
-        tui_displayMeasures(vals, pression_reference, pression_range, reference_sensor);
-        
-        /* Placer ici l'affichage du niveau de batterie 
-         
-         
-         
-         
-         */
-        
-        delay_ms(100);
-    }
 }
