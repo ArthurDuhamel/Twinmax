@@ -1,7 +1,5 @@
 #include "average.h"
 
-
-
 void averages_init(){
     // Initialise 4 averages
     extern struct movingAverage avgs[4];
@@ -39,7 +37,7 @@ void average_update_weighted_averages(){
     extern unsigned short weightedAverages[4];
     long tmp;
     int i=0;
-    for(i=0;i<4;i++){
+    for(i=0; i<4; i++){
         tmp = (weightedAverages[i] +  average_get_average(movingAverages[i]))/2;
         weightedAverages[i]= (unsigned short)tmp;
     }      
@@ -53,8 +51,6 @@ unsigned short averages_get_average(int i){
 unsigned short average_get_average(struct movingAverage * average){  
     return ((unsigned short)(average->sum / AVERAGE_SIZE));
 }
-
-
 
 void average_add_values(unsigned short value1, unsigned short value2, unsigned short value3, unsigned short value4){
     /* (unsigned short value1, unsigned short value2, unsigned short value3, unsigned short value4) */

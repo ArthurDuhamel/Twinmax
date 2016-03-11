@@ -62,6 +62,10 @@ volatile int backlight_level ;
 volatile int sensor_offsets[4];
 volatile int is_offset_set;
 
+volatile int isConnected;
+volatile int rxState;
+volatile int canSend;
+
 
 // struct movingAverage average_struct1;
 // struct movingAverage * average1;

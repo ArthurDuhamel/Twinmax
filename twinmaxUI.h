@@ -20,7 +20,7 @@
 
 void tui_drawGraph(unsigned char values[4], int referenceIndex);
 
-void tui_writeAt(unsigned char x,unsigned char y,const char* string,int reversed,int width);
+void tui_write_at(unsigned char x,unsigned char y,const char* string,int reversed,int width);
 
 void tui_menuItem(int index,const char *string,unsigned char highlighted);
 
@@ -33,5 +33,9 @@ void glcd_smallNumberAt(unsigned char page,unsigned char y,unsigned char value,i
 void tui_test();
 
 unsigned short measure_to_pressure(short val);
+
+void tui_battery(unsigned short value1);
+
+void tui_draw_number(unsigned char page, unsigned char y, unsigned short val);
 
 #endif

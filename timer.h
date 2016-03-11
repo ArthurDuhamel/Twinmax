@@ -17,6 +17,6 @@ void timer_start();
 
 // Timer Interrupt callback
 // Launch the adc
-void timer_top();
+void timer_stop();
 
 #endif

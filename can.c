@@ -1,6 +1,9 @@
 #include "can.h"
 #include "bluetooth.h"
 #include "inputs.h"
+#include "average.h"
+#include "engine.h"
+
 void adc_init(){
            
     // Set analog inputs for sensors (& battery ?)
@@ -17,14 +20,14 @@ void adc_init(){
     AD1CON1bits.SAMP = 0; //Wait for timer and ASSAM
     AD1CON1bits.DONE = 0; // Clear CAN flag
 
-    AD1CON2bits.PVCFG = 0b00; //Set AVdd as reference
+    AD1CON2bits.PVCFG = 0b00; //Set AVDD as reference
     AD1CON2bits.NVCFG0 = 0; //Set AVSS as reference
     AD1CON2bits.OFFCAL= 0; //Connect to normal inputs
     AD1CON2bits.BUFREGEN = 1; // No FIFO buffering
-    AD1CON2bits.SMPI = 0b00111; // Interruption occurs after 8 conversions
+    AD1CON2bits.SMPI = 0b01000; // Interruption occurs after 9 conversions
     AD1CON2bits.BUFM = 0; // FIFO buffer successive fill mode
-    AD1CON2bits.ALTS = 0; // Always use sample A chanel
-    AD1CON2bits.CSCNA = 1 ; //scan inputs
+    AD1CON2bits.ALTS = 0; // Always use sample A channel
+    AD1CON2bits.CSCNA = 1 ; // Scan inputs
     
     AD1CON3bits.ADRC = 0; //Use internal clock
     AD1CON3bits.SAMC = 0b00010; // Set as 2 * T_AD
@@ -54,7 +57,7 @@ void adc_init(){
      * RC1(PIN26) = Batterie     =  AN7
      */
 
-    AD1CSSL = 0b0001111001000011;
+    AD1CSSL = 0b0001111011000011;
     AD1CSSH = 0b0000000000000001;
     
     IFS0bits.AD1IF = 0 ; // Reset interrupt flag
@@ -71,7 +74,9 @@ void adc_launch(){
 void __attribute__((__interrupt__,__auto_psv__)) _ADC1Interrupt(void){
     // extern struct movingAverage * average1;
     // extern struct movingAverage * average2;
-
+    extern int isConnected;
+    extern int canSend;
+    
     AD1CON1bits.ASAM = 0;
     IFS0bits.AD1IF = 0 ; //reset interrupt flag
 
@@ -81,5 +86,17 @@ void __attribute__((__interrupt__,__auto_psv__)) _ADC1Interrupt(void){
     //average_add_values(SENSOR1AVGBUF, SENSOR2AVGBUF, SENSOR3AVGBUF, SENSOR4AVGBUF);  
     average_add_values(SENSOR4AVGBUF, SENSOR3AVGBUF, SENSOR2AVGBUF, SENSOR1AVGBUF);
     
-    ble_send();
+    if(isConnected == 0xFF) { 
+            isConnected = 0x00;
+            if(canSend == 0) {
+                __delay_ms(3000);
+                canSend = 1;
+            } else {
+                __delay_ms(1000);
+                canSend = 0;
+            }
+        }
+        if(canSend == 1) {
+            ble_start();  
+        }
 }

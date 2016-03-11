@@ -80,6 +80,8 @@ void lcd_draw_bar(unsigned char index, unsigned char value, int handling);
 
 void lcd_draw_reversed_char(unsigned char x, unsigned char y, char c);
 
+void lcd_draw(unsigned char page, unsigned char y, unsigned char symbol);
+
 void lcd_draw_char(unsigned char x, unsigned char y, char c);
 
 #endif
