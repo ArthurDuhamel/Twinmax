@@ -96,10 +96,11 @@ void tui_draw_number(unsigned char page, unsigned char y, unsigned short val) {
     tui_write_at(page, y, string, 0, 0);
 }
 
-void tui_battery(unsigned short val) {
+void tui_battery() {
+    extern unsigned short batteryLevel;
     int i = 0;
     unsigned char t;
-    unsigned short lvl = ((val - 1638)/142); // 1638 = 2V; 2620 = 3,2V, différence arrondie à 1000 et 1000/7 = 142 pour les 7 niveaux de batterie.
+    unsigned short lvl = ((batteryLevel - 1638)/142); // 1638 = 2V; 2620 = 3,2V, difference rounded to 1000 -> 1000/7 = 142 for the 7 battery levels.
     unsigned char fillMeter = 0b11111100 << (6 - lvl);
     lcd_draw(0, 120, battery[i]);
     for (i = 1; i < 6; i++) {

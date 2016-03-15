@@ -291,10 +291,6 @@ void engine_start() {
 
     average_update_weighted_averages();
     pression_reference = weightedAverages[reference_sensor];
-
-    int c = 0;
-    unsigned short batteryLevel = 0;
-    unsigned short memory = BATTERYLEVEL; // A ameliorer en faisant une petite moyenne avant, afin d'éviter les sursauts au démarrage.
     
     // Ajouts pour le timer de veille auto :
     int timerSleep = 0;
@@ -308,19 +304,12 @@ void engine_start() {
         }
         tui_displayMeasures(vals, pression_reference, pression_range, reference_sensor);
         
-        tui_battery(memory);
-        batteryLevel = batteryLevel + BATTERYLEVEL;
-        c++;
-        if (c == 20) {
-            memory = batteryLevel / 20;
-            batteryLevel = 0;
-            c = 0;
-        }
+        tui_battery();
         
-        // tui_draw_number(0, 60, weightedAverages[0]); (tests désapareillement)
-        //tui_draw_number(0, 60, BATTERYLEVEL); (tests batterie))
+        // tui_draw_number(0, 60, weightedAverages[0]); (for sensor testing)
+        //tui_draw_number(0, 60, batteryLevel); //(to test battery)
         
-        // Ci dessous : mise en veille automatique si pas d'activité pendant 3000 cycles = 5 minutes.
+        // Automatic sleep mode if the TwinMax is idle for a while (at atmospheric pressure)
         if ( (weightedAverages[0] < 2300) && (weightedAverages[0] > 2000) && (weightedAverages[1] < 2300) && (weightedAverages[1] > 2000) && (weightedAverages[2] < 2300) && (weightedAverages[2] > 2000) && (weightedAverages[3] < 2300) && (weightedAverages[3] > 2000) ) {
             timerSleep++;
             if (timerSleep > 3000) {

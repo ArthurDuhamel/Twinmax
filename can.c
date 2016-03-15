@@ -76,6 +76,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _ADC1Interrupt(void){
     // extern struct movingAverage * average2;
     extern int isConnected;
     extern int canSend;
+    extern unsigned short batteryLevel;
     
     AD1CON1bits.ASAM = 0;
     IFS0bits.AD1IF = 0 ; //reset interrupt flag
@@ -85,6 +86,8 @@ void __attribute__((__interrupt__,__auto_psv__)) _ADC1Interrupt(void){
 
     //average_add_values(SENSOR1AVGBUF, SENSOR2AVGBUF, SENSOR3AVGBUF, SENSOR4AVGBUF);  
     average_add_values(SENSOR4AVGBUF, SENSOR3AVGBUF, SENSOR2AVGBUF, SENSOR1AVGBUF);
+    
+    batteryLevel = (BATTERYLEVEL + batteryLevel)/2;
     
     if(isConnected == 0xFF) { 
             isConnected = 0x00;

@@ -2,18 +2,12 @@
 #define	TWINMAX_UI_H
 
 #include "glcd.h"
-
 #include <stdio.h>
-
-
 
 #ifndef MYFONT_H
 #define	MYFONT_H
 #include "myFont.h"
 #endif
-
-
-
 
 #define FONT_WIDTH 6
 #define NUMBER_WIDTH 4
@@ -34,7 +28,7 @@ void tui_test();
 
 unsigned short measure_to_pressure(short val);
 
-void tui_battery(unsigned short value1);
+void tui_battery();
 
 void tui_draw_number(unsigned char page, unsigned char y, unsigned short val);
 

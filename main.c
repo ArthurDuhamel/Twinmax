@@ -61,6 +61,7 @@ volatile unsigned short reference_sensor;
 volatile int backlight_level ; 
 volatile int sensor_offsets[4];
 volatile int is_offset_set;
+volatile unsigned short batteryLevel;
 
 volatile int isConnected;
 volatile int rxState;
