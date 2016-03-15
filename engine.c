@@ -318,6 +318,7 @@ void engine_start() {
         }
         
         // tui_draw_number(0, 60, weightedAverages[0]); (tests désapareillement)
+        //tui_draw_number(0, 60, BATTERYLEVEL); (tests batterie))
         
         // Ci dessous : mise en veille automatique si pas d'activité pendant 3000 cycles = 5 minutes.
         if ( (weightedAverages[0] < 2300) && (weightedAverages[0] > 2000) && (weightedAverages[1] < 2300) && (weightedAverages[1] > 2000) && (weightedAverages[2] < 2300) && (weightedAverages[2] > 2000) && (weightedAverages[3] < 2300) && (weightedAverages[3] > 2000) ) {
@@ -326,7 +327,6 @@ void engine_start() {
                 button_power_interupt();
             }
         }
-        
         delay_ms(100);
     }
 }
@@ -434,9 +434,7 @@ void engine_menu() {
     // Temporaly disable button interruption
     IEC1bits.CNIE = 0;
     extern unsigned short reference_sensor;
-    extern int isConnected;
-    extern int rxState;
-    extern int canSend;
+    
 
     /*if (engine_ask_for_bluetooth() == 1) {
         ble_init();
@@ -446,10 +444,10 @@ void engine_menu() {
      TEST
      */
     
-    ble_init();
+    /*ble_init();
     isConnected = 0x00;
     rxState = 0;
-    canSend = 0;
+    canSend = 0;*/
     
     
     lcd_clear_screen();
@@ -492,11 +490,20 @@ void engine_splash() {
 
 void engine_initialization() {
     pwm_init();
+    
+    extern int isConnected;
+    extern int rxState;
+    extern int canSend;
+    isConnected = 0x00;
+    rxState = 0;
+    canSend = 0;
+    ble_init();    
+    
     POWER_CIRCUIT_ENABLE = 1; //ALIMENTATION ENABLE
     delay_ms(1500);
     
     engine_splash();
-    // Initialise sleeping options
+    // Initialization of the sleeping options
     RCONbits.RETEN = 1;
     RCONbits.PMSLP = 0;
     

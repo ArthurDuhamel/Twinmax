@@ -92,7 +92,7 @@ void __attribute__((__interrupt__,__auto_psv__)) _ADC1Interrupt(void){
                 __delay_ms(3000);
                 canSend = 1;
             } else {
-                __delay_ms(1000);
+               // __delay_ms(1000);
                 canSend = 0;
             }
         }
