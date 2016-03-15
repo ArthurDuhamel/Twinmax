@@ -8,7 +8,6 @@
 
 /*ADC BUFFER WITH SENSOR CONVERTED MEASURE*/
 
-
 void adc_init();
 
 void adc_launch();

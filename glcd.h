@@ -8,7 +8,6 @@
 #include <p24FV16KM204.h>
 #include <libpic30.h>
 
-
 #define LCD_TRIS      TRISB
 #define LCD_DATA      PORTB
 #define ENABLE        LATCbits.LATC5
@@ -19,13 +18,9 @@
 #define CS2           LATCbits.LATC9
 
 #define LEFT          0b01
-
 #define RIGHT         0b10
-
 #define BOTH          0b11
-
 #define NONE          0b00
-
 
 void _lcd_enable(void);
 
@@ -51,9 +46,9 @@ void lcd_clear_screen(void);
 
 void lcd_selectside(unsigned char sides);
 
-void lcd_write (unsigned char data);
+void lcd_write(unsigned char data);
 
-unsigned char lcd_read (void);
+unsigned char lcd_read(void);
 
 void lcd_plotpixel(unsigned char rx, unsigned char ry);
 
@@ -62,7 +57,6 @@ void lcd_putchar(char c);
 void lcd_puts(char *string);
 
 void lcd_bitmap(const char *bmp);
- 
 
 void lcd_char(char c);
 
@@ -70,11 +64,11 @@ void lcd_testChar(char c);
 
 void lcd_longString(const char *string);
 
-void lcd_charAt(char c, int x,int y);
+void lcd_charAt(char c, int x, int y);
 
 void lcd_startLine(unsigned int z);
 
-void lcd_horizontalBar(unsigned char index,unsigned char val);
+void lcd_horizontalBar(unsigned char index, unsigned char val);
 
 void lcd_draw_bar(unsigned char index, unsigned char value, int handling);
 

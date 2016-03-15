@@ -3,7 +3,7 @@
 #define AVERAGE_SIZE 185
 
 // Average structure
-typedef struct movingAverage{
+typedef struct movingAverage {
   
   // Olds the value
   unsigned short values[AVERAGE_SIZE];

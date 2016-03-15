@@ -6,8 +6,6 @@
 #define delay_us __delay_us
 #endif
 
-
-
 void button_calibration_interrupt();
 
 void button_left_interupt();

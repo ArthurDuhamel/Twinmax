@@ -1,9 +1,7 @@
 #ifndef HEADERS_H
 #define	HEADERS_H
 
-
 #include <p24FV16KM204.h>
-
 
 #define FCY 16000000UL
 #include <libpic30.h>

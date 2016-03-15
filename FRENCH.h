@@ -6,13 +6,13 @@
 extern "C" {
 #endif
 
-    #define BLUETOOTH "Activer le        bluetooth ?"
-    #define YES "Oui"
-    #define NO "Non"
-    #define REFERENCE "Cylindre de       reference"
-    #define BYE "Au revoir ! "
+#define BLUETOOTH "Activer le        bluetooth ?"
+#define YES "Oui"
+#define NO "Non"
+#define REFERENCE "Cylindre de       reference"
+#define BYE "Au revoir ! "
 
-    
+
 #ifdef  __cplusplus
 }
 #endif

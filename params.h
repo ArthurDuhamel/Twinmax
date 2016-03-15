@@ -23,8 +23,6 @@
 #endif
 #define MENU_WIDTH 28
 
-
-
 #define TRISB_BASE_CONF 0b1111001000000000
 
 #endif	/* PARAMS_H */
