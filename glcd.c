@@ -20,7 +20,7 @@ void _lcd_reset(void) {
         __delay_us(5); // .5 ms
     }
 }
-*/
+ */
 
 /*
 void lcd_off() {
@@ -39,7 +39,7 @@ void lcd_off() {
     ENABLE = 0;
     __delay_us(.1);
 }
-*/
+ */
 
 /*Reads a byte from the display ram - data will be read from the active X and Y - the display increments its y register  */
 /*
@@ -66,7 +66,7 @@ unsigned char lcd_read(void) {
     currentY++;
     return _data;
 }
-*/
+ */
 
 /*
 void glcd_smallNumberAt(unsigned char page, unsigned char y, unsigned char value, int reversed) {
@@ -76,7 +76,7 @@ void glcd_smallNumberAt(unsigned char page, unsigned char y, unsigned char value
         lcd_write(SmallNumbers[value][i]);
     }
 }
-*/
+ */
 
 /*
 void lcd_startLine(unsigned int z) {

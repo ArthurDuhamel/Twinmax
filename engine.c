@@ -13,9 +13,6 @@
 #include "headers.h"
 #include "bluetooth.h"
 
-
-
-
 enum engine_phase {
     INIT,
     RUN,
@@ -80,47 +77,45 @@ void button_power_interupt() {
     return;
 }
 
-
-
 void __attribute__((__interrupt__, auto_psv))_ISR _U1RXInterrupt(void) {
     char buffer[8];
     int i = 0;
     extern int isConnected;
     extern int rxState;
     U1TXREG = isConnected;
-    if(U1STAbits.OERR == 1) {
+    if (U1STAbits.OERR == 1) {
         U1STAbits.OERR = 0;
     }
-    while(U1STAbits.URXDA == 1) {
-        if(i<8) {
-           buffer[i] = U1RXREG;
+    while (U1STAbits.URXDA == 1) {
+        if (i < 8) {
+            buffer[i] = U1RXREG;
         }
         i++;
     }
-    switch(rxState) {
+    switch (rxState) {
         case 0:
-            if(buffer[0] == 'O') {
+            if (buffer[0] == 'O') {
                 rxState = 1;
             } else {
                 rxState = 0;
             }
             break;
         case 1:
-            if(buffer[0] == 'K') {
+            if (buffer[0] == 'K') {
                 rxState = 2;
             } else {
                 rxState = 0;
             }
             break;
         case 2:
-            if(buffer[0] == '+') {
+            if (buffer[0] == '+') {
                 rxState = 3;
             } else {
                 rxState = 0;
             }
             break;
         case 3:
-            if(buffer[0] == 'C') {
+            if (buffer[0] == 'C') {
                 rxState = 4;
             } else if (buffer[0] == 'L') {
                 rxState = 7;
@@ -129,21 +124,21 @@ void __attribute__((__interrupt__, auto_psv))_ISR _U1RXInterrupt(void) {
             }
             break;
         case 4:
-            if(buffer[0] == 'O') {
+            if (buffer[0] == 'O') {
                 rxState = 5;
             } else {
                 rxState = 0;
             }
             break;
         case 5:
-            if(buffer[0] == 'N') {
+            if (buffer[0] == 'N') {
                 rxState = 6;
             } else {
                 rxState = 0;
             }
             break;
         case 6:
-            if(buffer[0] == 'N') {
+            if (buffer[0] == 'N') {
                 rxState = 0;
                 isConnected = 0xFF;
             } else {
@@ -151,21 +146,21 @@ void __attribute__((__interrupt__, auto_psv))_ISR _U1RXInterrupt(void) {
             }
             break;
         case 7:
-            if(buffer[0] == 'O') {
+            if (buffer[0] == 'O') {
                 rxState = 8;
             } else {
                 rxState = 0;
             }
             break;
         case 8:
-            if(buffer[0] == 'S') {
+            if (buffer[0] == 'S') {
                 rxState = 9;
             } else {
                 rxState = 0;
             }
             break;
         case 9:
-            if(buffer[0] == 'T') {
+            if (buffer[0] == 'T') {
                 rxState = 0;
                 isConnected = 0xFF;
             } else {
@@ -176,15 +171,14 @@ void __attribute__((__interrupt__, auto_psv))_ISR _U1RXInterrupt(void) {
     //isConnected = 0xFF;
     //Clear flag !
     IFS0bits.U1RXIF = 0;
-    
+
 }
 
-void __attribute__((__interrupt__, auto_psv))_ISR _U1TXInterrupt(void){
+void __attribute__((__interrupt__, auto_psv))_ISR _U1TXInterrupt(void) {
     ble_send();
-    IFS0bits.U1TXIF=0b0;// remise à 0 du flag
+    IFS0bits.U1TXIF = 0b0; // remise à 0 du flag
     return;
-  } // end interrupt
-
+} // end interrupt
 
 void set_scale(unsigned short new_reference, unsigned short new_range) {
     extern unsigned short pression_range;
@@ -269,8 +263,6 @@ void __attribute__((__interrupt__, __auto_psv__)) _CNInterrupt(void) {
     return;
 }
 
-
-
 void engine_start() {
     extern unsigned short weightedAverages[4];
     extern unsigned short pression_range;
@@ -291,11 +283,11 @@ void engine_start() {
 
     average_update_weighted_averages();
     pression_reference = weightedAverages[reference_sensor];
-    
+
     // Ajouts pour le timer de veille auto :
     int timerSleep = 0;
     //unsigned short valeursSleep [4];
-    
+
     while (phase == RUN) {
 
         average_update_weighted_averages();
@@ -303,14 +295,14 @@ void engine_start() {
             vals[i] = weightedAverages[i] + sensor_offsets[i];
         }
         tui_displayMeasures(vals, pression_reference, pression_range, reference_sensor);
-        
+
         tui_battery();
-        
+
         // tui_draw_number(0, 60, weightedAverages[0]); (for sensor testing)
         //tui_draw_number(0, 60, batteryLevel); //(to test battery)
-        
+
         // Automatic sleep mode if the TwinMax is idle for a while (at atmospheric pressure)
-        if ( (weightedAverages[0] < 2300) && (weightedAverages[0] > 2000) && (weightedAverages[1] < 2300) && (weightedAverages[1] > 2000) && (weightedAverages[2] < 2300) && (weightedAverages[2] > 2000) && (weightedAverages[3] < 2300) && (weightedAverages[3] > 2000) ) {
+        if ((weightedAverages[0] < 2300) && (weightedAverages[0] > 2000) && (weightedAverages[1] < 2300) && (weightedAverages[1] > 2000) && (weightedAverages[2] < 2300) && (weightedAverages[2] > 2000) && (weightedAverages[3] < 2300) && (weightedAverages[3] > 2000)) {
             timerSleep++;
             if (timerSleep > 3000) {
                 button_power_interupt();
@@ -423,22 +415,22 @@ void engine_menu() {
     // Temporaly disable button interruption
     IEC1bits.CNIE = 0;
     extern unsigned short reference_sensor;
-    
+
 
     /*if (engine_ask_for_bluetooth() == 1) {
         ble_init();
     }*/
-    
+
     /*
      TEST
      */
-    
+
     /*ble_init();
     isConnected = 0x00;
     rxState = 0;
     canSend = 0;*/
-    
-    
+
+
     lcd_clear_screen();
     reference_sensor = engine_ask_for_reference_sensor();
     lcd_clear_screen();
@@ -479,23 +471,23 @@ void engine_splash() {
 
 void engine_initialization() {
     pwm_init();
-    
+
     extern int isConnected;
     extern int rxState;
     extern int canSend;
     isConnected = 0x00;
     rxState = 0;
     canSend = 0;
-    ble_init();    
-    
+    ble_init();
+
     POWER_CIRCUIT_ENABLE = 1; //ALIMENTATION ENABLE
     delay_ms(1500);
-    
+
     engine_splash();
     // Initialization of the sleeping options
     RCONbits.RETEN = 1;
     RCONbits.PMSLP = 0;
-    
+
     engine_menu();
     delay_ms(650);
     init_button_interrupt();

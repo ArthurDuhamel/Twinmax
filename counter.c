@@ -1,12 +1,13 @@
 #include "counter.h"
-void get(){
+
+void get() {
 
 }
 
-void set(){
+void set() {
 
 }
 
-void inc(){
-  
+void inc() {
+
 }

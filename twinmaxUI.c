@@ -16,7 +16,7 @@ const char battery[6] = {
 };
 
 void tui_draw_graph(unsigned char height[4], int referenceIndex) {
-    
+
     lcd_draw_bar(0, height[0], referenceIndex == 0);
     lcd_draw_bar(1, height[1], referenceIndex == 1);
 #ifndef TWO_BARS
@@ -100,7 +100,7 @@ void tui_battery() {
     extern unsigned short batteryLevel;
     int i = 0;
     unsigned char t;
-    unsigned short lvl = ((batteryLevel - 1638)/142); // 1638 = 2V; 2620 = 3,2V, difference rounded to 1000 -> 1000/7 = 142 for the 7 battery levels.
+    unsigned short lvl = ((batteryLevel - 1638) / 142); // 1638 = 2V; 2620 = 3,2V, difference rounded to 1000 -> 1000/7 = 142 for the 7 battery levels.
     unsigned char fillMeter = 0b11111100 << (6 - lvl);
     lcd_draw(0, 120, battery[i]);
     for (i = 1; i < 6; i++) {

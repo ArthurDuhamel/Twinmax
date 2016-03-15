@@ -58,7 +58,7 @@ volatile unsigned long weightedAverages[4];
 volatile unsigned short pression_reference;
 volatile unsigned short pression_range;
 volatile unsigned short reference_sensor;
-volatile int backlight_level ; 
+volatile int backlight_level;
 volatile int sensor_offsets[4];
 volatile int is_offset_set;
 volatile unsigned short batteryLevel;
@@ -70,34 +70,34 @@ volatile int canSend;
 
 // struct movingAverage average_struct1;
 // struct movingAverage * average1;
- 
+
 int main(void) {
 
-    if(is_offset_set != 1){
-        int i=0;
-        for(i=0;i<4;i++){
-        sensor_offsets[i]=0;      
-            
+    if (is_offset_set != 1) {
+        int i = 0;
+        for (i = 0; i < 4; i++) {
+            sensor_offsets[i] = 0;
+
         }
-        is_offset_set = 1 ;
+        is_offset_set = 1;
     }
-    
-    
+
+
     CLKDIV = 0; // No clock prescaler
     // Use standard vector table, DISI is not active, Every Interrupts on positive edge
     INTCON2 = 0;
     // Interrupt Nesting Disabled
     INTCON1bits.NSTDIS = 0;
- 
+
     // Set outputs / inputs
-    TRISA = 0b0000110001111111; 
+    TRISA = 0b0000110001111111;
     //TRISA = 0b0000110001110011;  //FOR TESTS
     TRISB = 0b1111001000000000;
     TRISC = 0b0000000001000011;
 
-    POWER_CIRCUIT_ENABLE = 1 ; //ALMIENTATION ENABLE
+    POWER_CIRCUIT_ENABLE = 1; //ALMIENTATION ENABLE
     //tui_writeAt(3,20,"COUCOU LES LOULOUS",0,0);
-    
+
     engine_initialization();
     return 1;
 }

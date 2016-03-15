@@ -63,7 +63,7 @@ void ble_start() {
 
 void ble_init() {
     initBTModule();
-    
+
     ////uart setup///////
     U1BRG = 0x0010;
     U1MODE = 0b1000100000001000; //OK 
