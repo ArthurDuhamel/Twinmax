@@ -295,8 +295,10 @@ void engine_start() {
     int c = 0;
     unsigned short batteryLevel = 0;
     unsigned short memory = BATTERYLEVEL; // A ameliorer en faisant une petite moyenne avant, afin d'éviter les sursauts au démarrage.
-    unsigned short sensorLevel = 0;
-    unsigned short memorySensor;
+    
+    // Ajouts pour le timer de veille auto :
+    int timerSleep = 0;
+    //unsigned short valeursSleep [4];
     
     while (phase == RUN) {
 
@@ -314,17 +316,16 @@ void engine_start() {
             batteryLevel = 0;
             c = 0;
         }
-                
-        // SENSOR4AVGBUF
-        /*sensorLevel = sensorLevel + SENSOR4AVGBUF;
-        c++;
-        if (c == 20) {
-            memorySensor = sensorLevel / 20;
-            sensorLevel = 0;
-            c = 0;
+        
+        // tui_draw_number(0, 60, weightedAverages[0]); (tests désapareillement)
+        
+        // Ci dessous : mise en veille automatique si pas d'activité pendant 3000 cycles = 5 minutes.
+        if ( (weightedAverages[0] < 2300) && (weightedAverages[0] > 2000) && (weightedAverages[1] < 2300) && (weightedAverages[1] > 2000) && (weightedAverages[2] < 2300) && (weightedAverages[2] > 2000) && (weightedAverages[3] < 2300) && (weightedAverages[3] > 2000) ) {
+            timerSleep++;
+            if (timerSleep > 3000) {
+                button_power_interupt();
+            }
         }
-        */
-        tui_draw_number(0, 60, weightedAverages[0]);
         
         delay_ms(100);
     }
