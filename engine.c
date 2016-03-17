@@ -76,10 +76,7 @@ void button_power_interupt() {
 
         POWER_CIRCUIT_ENABLE = 0;
         IFS1bits.CNIF = 0;
-        
-        TRISA = 0b000000000000000;
-        TRISB = 0b000000000000000;
-        TRISC = 0b000000000000000;      
+            
         U1MODEbits.UARTEN = 0; // Disable the UART.
         CCP5CON1Lbits.CCPON = 0; // Turn off MCCP module to disable PWM.
         
