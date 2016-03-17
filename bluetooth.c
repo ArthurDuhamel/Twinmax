@@ -67,8 +67,9 @@ void ble_init() {
     ////uart setup///////
     U1BRG = 0x0010;
     U1MODE = 0b1000100000001000; //OK 
-    U1STA = 0b0010010100010000; //bit 15-13 = 01 : flag passe à 1 lorsque que le TSR est vide // Receviver not active
+    U1STA = 0b0010010100010000; //bit 15-13 = 01 : flag passe à 1 lorsque que le TSR est vide // Receiver not active
     //U1STA = 0b0010010100000000; //Receive active
+    
     ////uart intertupt/////
     IPC3bits.U1TXIP = 0b011; // priority = 3
     IFS0bits.U1TXIF = 0; //interrupt has request
@@ -89,7 +90,6 @@ void UARTInit230400(void) {
     //    TRISB = 0x0000;     // port B en sortie
 
     U1BRG = 0x0010; //pour mode fast
-
 
     U1MODE = 0b1000100000001000; //mode fast
 

@@ -67,11 +67,22 @@ void button_power_interupt() {
         CS2 = CSLOW;
         RESET = 0;
         DI = 0;
-
+        // Idem BLE
+        //RTSoff = 0;
+        //CTSoff = 0;
+        //RXoff = 0;
+        //TXoff = 0;
         //OSCCONbits.CLKLOCK;
 
         POWER_CIRCUIT_ENABLE = 0;
         IFS1bits.CNIF = 0;
+        
+        TRISA = 0b000000000000000;
+        TRISB = 0b000000000000000;
+        TRISC = 0b000000000000000;      
+        U1MODEbits.UARTEN = 0; // Disable the UART.
+        CCP5CON1Lbits.CCPON = 0; // Turn off MCCP module to disable PWM.
+        
         Sleep();
     }
     return;
@@ -240,7 +251,7 @@ void button_calibration_interrupt() {
 
 void __attribute__((__interrupt__, __auto_psv__)) _CNInterrupt(void) {
 
-    delay_ms(200);
+    delay_ms(100); // 200 auparavant
 
     if (LEFT_BUTTON == 1 && RIGHT_BUTTON == 1) {
         button_calibration_interrupt();
@@ -421,10 +432,6 @@ void engine_menu() {
         ble_init();
     }*/
 
-    /*
-     TEST
-     */
-
     /*ble_init();
     isConnected = 0x00;
     rxState = 0;
@@ -470,11 +477,12 @@ void engine_splash() {
 }
 
 void engine_initialization() {
-    pwm_init();
-
     extern int isConnected;
     extern int rxState;
     extern int canSend;
+    
+    pwm_init();
+    
     isConnected = 0x00;
     rxState = 0;
     canSend = 0;
@@ -482,7 +490,6 @@ void engine_initialization() {
 
     POWER_CIRCUIT_ENABLE = 1; //ALIMENTATION ENABLE
     delay_ms(1500);
-
     engine_splash();
     // Initialization of the sleeping options
     RCONbits.RETEN = 1;

@@ -27,4 +27,10 @@
 #define POWER_CIRCUIT_ENABLE PORTAbits.RA8 
 #define BACKLIGHT_OUTPUT PORTAbits.RA7
 
+// For BLE :
+#define RTSoff PORTBbits.RB9   
+#define RXoff PORTCbits.RC6
+#define TXoff PORTCbits.RC7
+#define CTSoff PORTBbits.RB8
+
 #endif	/* INPUTS_H */

@@ -22,6 +22,12 @@
 #define BOTH          0b11
 #define NONE          0b00
 
+// Ports définis pour couper le bluetooth
+#define RTS LATBbits.LATB9   
+#define RX LATCbits.LATC6
+#define TX LATCbits.LATC7
+#define CTS LATBbits.LATB8
+
 void _lcd_enable(void);
 
 unsigned char _lcd_status(void);
