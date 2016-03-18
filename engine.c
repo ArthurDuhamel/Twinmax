@@ -19,7 +19,6 @@ enum engine_phase {
     SLEEP
 };
 
-
 volatile int is_blueetooth_enable;
 volatile enum engine_phase phase = INIT;
 
@@ -29,16 +28,19 @@ void pwm_set(int level) {
         CCP5RB = 0xFFFF;
     }
     if (level == 1) {
-        CCP5RB = 0x8888;
+        CCP5RB = 0x8000;
     }
     if (level == 2) {
-        CCP5RB = 0x00;
+        CCP5RB = 0x0000;
     }
 }
 
 void button_light_interupt() {
     extern int backlight_level;
-    backlight_level = (backlight_level + 1) % 3;
+    backlight_level = backlight_level + 1;
+    if (backlight_level == 3) {
+        backlight_level = 0;
+    }
     pwm_set(backlight_level);
     delay_ms(200);
     return;
@@ -58,27 +60,20 @@ void button_power_interupt() {
         lcd_clear_screen();
         tui_write_at(3, 40, BYE, 0, 0);
         delay_ms(1000);
-        //PORTA = 0;
-        //PORTB = 0;
-        //LATC = 0;
-        //lcd_off();
-
+        POWER_CIRCUIT_ENABLE = 0;
+        
+        /* Tests */
+        //CCP5CON1Lbits.CCSEL = 1;
+        //LATAbits.LATA8 = 0;
+        //ANSA = ANSA || 0b0000000100000000;
+        
         /* Ajouté pour corriger la conso */
         CS2 = CSLOW;
         RESET = 0;
         DI = 0;
-        // Idem BLE
-        //RTSoff = 0;
-        //CTSoff = 0;
-        //RXoff = 0;
-        //TXoff = 0;
-        //OSCCONbits.CLKLOCK;
-
-        POWER_CIRCUIT_ENABLE = 0;
         IFS1bits.CNIF = 0;
-            
-        U1MODEbits.UARTEN = 0; // Disable the UART.
         CCP5CON1Lbits.CCPON = 0; // Turn off MCCP module to disable PWM.
+        U1MODEbits.UARTEN = 0; // Disable the UART.
         
         Sleep();
     }
@@ -459,7 +454,7 @@ void pwm_init() {
     CCP5TMRL = 0x0000;
     CCP5PRL = 0xFFFF;
     CCP5RA = 0x0000;
-    CCP5RB = 0xFFFF; // CHANJAY
+    CCP5RB = 0xFFFF;
     CCP5CON1Lbits.CCPON = 1; // Turn on MCCP module
 }
 
@@ -477,9 +472,9 @@ void engine_initialization() {
     extern int isConnected;
     extern int rxState;
     extern int canSend;
-    
+
     pwm_init();
-    
+
     isConnected = 0x00;
     rxState = 0;
     canSend = 0;

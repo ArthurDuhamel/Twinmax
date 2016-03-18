@@ -67,10 +67,6 @@ volatile int isConnected;
 volatile int rxState;
 volatile int canSend;
 
-
-// struct movingAverage average_struct1;
-// struct movingAverage * average1;
-
 int main(void) {
 
     if (is_offset_set != 1) {
