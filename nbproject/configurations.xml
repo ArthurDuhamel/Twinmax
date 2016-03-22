@@ -80,9 +80,9 @@
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
       <C30>
-        <property key="code-model" value="default"/>
-        <property key="const-model" value="default"/>
-        <property key="data-model" value="default"/>
+        <property key="code-model" value="small-code"/>
+        <property key="const-model" value="const-in-code"/>
+        <property key="data-model" value="large-data"/>
         <property key="disable-instruction-scheduling" value="false"/>
         <property key="enable-all-warnings" value="true"/>
         <property key="enable-ansi-std" value="false"/>
@@ -115,7 +115,7 @@
         <property key="post-instruction-scheduling" value="default"/>
         <property key="pre-instruction-scheduling" value="default"/>
         <property key="preprocessor-macros" value=""/>
-        <property key="scalar-model" value="default"/>
+        <property key="scalar-model" value="small-scalar"/>
         <property key="use-cci" value="false"/>
         <property key="use-iar" value="false"/>
       </C30>
@@ -173,9 +173,9 @@
         <property key="oXC16ld-force-link" value="false"/>
         <property key="oXC16ld-no-smart-io" value="false"/>
         <property key="oXC16ld-nostdlib" value="false"/>
-        <property key="oXC16ld-stackguard" value="16"/>
+        <property key="oXC16ld-stackguard" value="0"/>
         <property key="preprocessor-macros" value=""/>
-        <property key="remove-unused-sections" value="false"/>
+        <property key="remove-unused-sections" value="true"/>
         <property key="report-memory-usage" value="true"/>
         <property key="secure-eeprom" value="no_eeprom"/>
         <property key="secure-flash" value="no_flash"/>

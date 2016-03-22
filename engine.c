@@ -85,6 +85,7 @@ void __attribute__((__interrupt__, auto_psv))_ISR _U1RXInterrupt(void) {
     int i = 0;
     extern int isConnected;
     extern int rxState;
+    
     U1TXREG = isConnected;
     if (U1STAbits.OERR == 1) {
         U1STAbits.OERR = 0;
@@ -480,13 +481,12 @@ void engine_initialization() {
     canSend = 0;
     ble_init();
 
-    POWER_CIRCUIT_ENABLE = 1; //ALIMENTATION ENABLE
+    POWER_CIRCUIT_ENABLE = 1; // ALIMENTATION ENABLE
     delay_ms(1500);
     engine_splash();
     // Initialization of the sleeping options
     RCONbits.RETEN = 1;
     RCONbits.PMSLP = 0;
-
     engine_menu();
     delay_ms(650);
     init_button_interrupt();

@@ -6,7 +6,7 @@ UINT8_T shiftLeft(unsigned short data);  // shift les 6 premiers bits en sortie 
 UINT8_T shiftRight(unsigned short data); // shift les 6 derniers bits en sortie du convertisseur (00000XXXXXX)
 void ble_send();
 void vle_frame_formating();
-void ble_config();
+//void ble_config();
 void ble_start();
 
 void UARTInit(void);                        // init UART with specified baud rate
@@ -23,8 +23,6 @@ void UARTSetBTName();
 void UARTSleep();
 void initBTModule();
 void UARTSetADTypeIOSVal();
-
-
 void ble_init();
 void ble_send();
 

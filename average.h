@@ -1,7 +1,7 @@
 #ifndef AVERAGE_H
 #define	AVERAGE_H
-//#define AVERAGE_SIZE 185
-#define AVERAGE_SIZE 185
+//#define AVERAGE_SIZE 200
+#define AVERAGE_SIZE 193
 
 // Average structure
 typedef struct movingAverage {

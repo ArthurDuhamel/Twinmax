@@ -80,13 +80,9 @@ void __attribute__((__interrupt__, __auto_psv__)) _ADC1Interrupt(void) {
 
     AD1CON1bits.ASAM = 0;
     IFS0bits.AD1IF = 0; //reset interrupt flag
-
-    // average_add_value(average1, SENSOR4BUF);
-    // average_add_value(average2, SENSOR3BUF);
-
-    //average_add_values(SENSOR1AVGBUF, SENSOR2AVGBUF, SENSOR3AVGBUF, SENSOR4AVGBUF);  
+    // Updating the pressure values in the arrays.
     average_add_values(SENSOR4AVGBUF, SENSOR3AVGBUF, SENSOR2AVGBUF, SENSOR1AVGBUF);
-
+    // Updating the battery level.
     batteryLevel = (BATTERYLEVEL + batteryLevel) / 2;
 
     if (isConnected == 0xFF) {

@@ -91,8 +91,7 @@ int main(void) {
     TRISB = 0b1111001000000000;
     TRISC = 0b0000000001000011;
 
-    POWER_CIRCUIT_ENABLE = 1; //ALMIENTATION ENABLE
-    //tui_writeAt(3,20,"COUCOU LES LOULOUS",0,0);
+    POWER_CIRCUIT_ENABLE = 1; //ALIMENTATION ENABLE
 
     engine_initialization();
     return 1;
