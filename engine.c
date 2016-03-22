@@ -25,13 +25,13 @@ volatile enum engine_phase phase = INIT;
 void pwm_set(int level) {
     /* Définit les différents niveau de la PWM pour le backlight */
     if (level == 0) {
-        CCP5RB = 0xFFFF;
+        CCP5RB = 0x0000;
     }
     if (level == 1) {
         CCP5RB = 0x8000;
     }
     if (level == 2) {
-        CCP5RB = 0x0000;
+        CCP5RB = 0xFFFF;
     }
 }
 
@@ -455,7 +455,7 @@ void pwm_init() {
     CCP5TMRL = 0x0000;
     CCP5PRL = 0xFFFF;
     CCP5RA = 0x0000;
-    CCP5RB = 0xFFFF;
+    CCP5RB = 0x0000; // CCP5RB = 0xFFFF;
     CCP5CON1Lbits.CCPON = 1; // Turn on MCCP module
 }
 

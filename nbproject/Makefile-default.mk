@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=glcd.c main.c twinmaxUI.c bluetooth.c can.c counter.c engine.c timer.c average.c
+SOURCEFILES_QUOTED_IF_SPACED=glcd.c main.c twinmaxUI.c bluetooth.c can.c engine.c timer.c average.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/glcd.o ${OBJECTDIR}/main.o ${OBJECTDIR}/twinmaxUI.o ${OBJECTDIR}/bluetooth.o ${OBJECTDIR}/can.o ${OBJECTDIR}/counter.o ${OBJECTDIR}/engine.o ${OBJECTDIR}/timer.o ${OBJECTDIR}/average.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/glcd.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/twinmaxUI.o.d ${OBJECTDIR}/bluetooth.o.d ${OBJECTDIR}/can.o.d ${OBJECTDIR}/counter.o.d ${OBJECTDIR}/engine.o.d ${OBJECTDIR}/timer.o.d ${OBJECTDIR}/average.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/glcd.o ${OBJECTDIR}/main.o ${OBJECTDIR}/twinmaxUI.o ${OBJECTDIR}/bluetooth.o ${OBJECTDIR}/can.o ${OBJECTDIR}/engine.o ${OBJECTDIR}/timer.o ${OBJECTDIR}/average.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/glcd.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/twinmaxUI.o.d ${OBJECTDIR}/bluetooth.o.d ${OBJECTDIR}/can.o.d ${OBJECTDIR}/engine.o.d ${OBJECTDIR}/timer.o.d ${OBJECTDIR}/average.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/glcd.o ${OBJECTDIR}/main.o ${OBJECTDIR}/twinmaxUI.o ${OBJECTDIR}/bluetooth.o ${OBJECTDIR}/can.o ${OBJECTDIR}/counter.o ${OBJECTDIR}/engine.o ${OBJECTDIR}/timer.o ${OBJECTDIR}/average.o
+OBJECTFILES=${OBJECTDIR}/glcd.o ${OBJECTDIR}/main.o ${OBJECTDIR}/twinmaxUI.o ${OBJECTDIR}/bluetooth.o ${OBJECTDIR}/can.o ${OBJECTDIR}/engine.o ${OBJECTDIR}/timer.o ${OBJECTDIR}/average.o
 
 # Source Files
-SOURCEFILES=glcd.c main.c twinmaxUI.c bluetooth.c can.c counter.c engine.c timer.c average.c
+SOURCEFILES=glcd.c main.c twinmaxUI.c bluetooth.c can.c engine.c timer.c average.c
 
 
 CFLAGS=
@@ -117,13 +117,6 @@ ${OBJECTDIR}/can.o: can.c  nbproject/Makefile-${CND_CONF}.mk
 	${MP_CC} $(MP_EXTRA_CC_PRE)  can.c  -o ${OBJECTDIR}/can.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/can.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1    -omf=elf -no-legacy-libc  -msmall-code -mlarge-data -msmall-scalar -mconst-in-code -Os -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/can.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
-${OBJECTDIR}/counter.o: counter.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/counter.o.d 
-	@${RM} ${OBJECTDIR}/counter.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  counter.c  -o ${OBJECTDIR}/counter.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/counter.o.d"      -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1    -omf=elf -no-legacy-libc  -msmall-code -mlarge-data -msmall-scalar -mconst-in-code -Os -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/counter.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
 ${OBJECTDIR}/engine.o: engine.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/engine.o.d 
@@ -180,13 +173,6 @@ ${OBJECTDIR}/can.o: can.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/can.o 
 	${MP_CC} $(MP_EXTRA_CC_PRE)  can.c  -o ${OBJECTDIR}/can.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/can.o.d"        -g -omf=elf -no-legacy-libc  -msmall-code -mlarge-data -msmall-scalar -mconst-in-code -Os -msmart-io=1 -Wall -msfr-warn=off  
 	@${FIXDEPS} "${OBJECTDIR}/can.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
-	
-${OBJECTDIR}/counter.o: counter.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/counter.o.d 
-	@${RM} ${OBJECTDIR}/counter.o 
-	${MP_CC} $(MP_EXTRA_CC_PRE)  counter.c  -o ${OBJECTDIR}/counter.o  -c -mcpu=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/counter.o.d"        -g -omf=elf -no-legacy-libc  -msmall-code -mlarge-data -msmall-scalar -mconst-in-code -Os -msmart-io=1 -Wall -msfr-warn=off  
-	@${FIXDEPS} "${OBJECTDIR}/counter.o.d" $(SILENT)  -rsi ${MP_CC_DIR}../ 
 	
 ${OBJECTDIR}/engine.o: engine.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
