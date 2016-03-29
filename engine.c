@@ -277,6 +277,10 @@ void engine_start() {
     unsigned short vals[4];
     int i = 0;
     phase = RUN;
+    
+    // Réinitialisation du nom du bluetooth :
+    //ble_init();
+    perso(); // TEST reset + changement nom.
 
     timer_start();
 
@@ -420,17 +424,6 @@ void engine_menu() {
     IEC1bits.CNIE = 0;
     extern unsigned short reference_sensor;
 
-
-    /*if (engine_ask_for_bluetooth() == 1) {
-        ble_init();
-    }*/
-
-    /*ble_init();
-    isConnected = 0x00;
-    rxState = 0;
-    canSend = 0;*/
-
-
     lcd_clear_screen();
     reference_sensor = engine_ask_for_reference_sensor();
     lcd_clear_screen();
@@ -479,10 +472,15 @@ void engine_initialization() {
     isConnected = 0x00;
     rxState = 0;
     canSend = 0;
-    ble_init();
-
-    POWER_CIRCUIT_ENABLE = 1; // ALIMENTATION ENABLE
-    delay_ms(1500);
+    
+    //ble_init();
+    
+    //POWER_CIRCUIT_ENABLE = 1; // ALIMENTATION ENABLE
+    //delay_ms(500);
+    
+    
+    //ble_init();
+    
     engine_splash();
     // Initialization of the sleeping options
     RCONbits.RETEN = 1;

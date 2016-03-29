@@ -13,7 +13,7 @@ void UARTInit(void);                        // init UART with specified baud rat
 UINT8_T UARTReadByte(void);                 // read a byte from UART
 void UARTWriteByte(UINT8_T data);           // write a byte to UART
 void UARTBasicCommand();
-void UARTConfigBaudRate215400();
+void UARTConfigBaudRate230400();
 void UARTWriteChar(char data);
 void UARTWakeUp();
 void resetBTModule();
@@ -25,5 +25,8 @@ void initBTModule();
 void UARTSetADTypeIOSVal();
 void ble_init();
 void ble_send();
+void UARTRenewModule();
+
+void perso();
 
 #endif

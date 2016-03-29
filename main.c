@@ -7,6 +7,7 @@
 
 #include "headers.h"
 #include "inputs.h"
+#include "bluetooth.h"
 
 // PIC24FV16KM204 Configuration Bit Settings
 
@@ -68,31 +69,35 @@ volatile int rxState;
 volatile int canSend;
 
 int main(void) {
-
+    isConnected = 0x00;
+    CLKDIV = 0; // No clock prescaler
+    
+    POWER_CIRCUIT_ENABLE = 1;
+    delay_ms(500);
+    //ble_init();
+    
     if (is_offset_set != 1) {
         int i = 0;
         for (i = 0; i < 4; i++) {
             sensor_offsets[i] = 0;
-
         }
         is_offset_set = 1;
     }
-
-
-    CLKDIV = 0; // No clock prescaler
+    
     // Use standard vector table, DISI is not active, Every Interrupts on positive edge
     INTCON2 = 0;
     // Interrupt Nesting Disabled
     INTCON1bits.NSTDIS = 0;
-
+    
     // Set outputs / inputs
     TRISA = 0b0000110001111111;
-    //TRISA = 0b0000110001110011;  //FOR TESTS
     TRISB = 0b1111001000000000;
     TRISC = 0b0000000001000011;
-
-    POWER_CIRCUIT_ENABLE = 1; //ALIMENTATION ENABLE
-
+    
+    //POWER_CIRCUIT_ENABLE = 1; //ALIMENTATION ENABLE
+    //delay_ms(500);
+    ble_init();
+    
     engine_initialization();
     return 1;
 }
