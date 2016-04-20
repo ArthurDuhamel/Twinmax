@@ -85,7 +85,7 @@ void __attribute__((__interrupt__, __auto_psv__)) _ADC1Interrupt(void) {
     // Updating the battery level.
     batteryLevel = (BATTERYLEVEL + batteryLevel) / 2;
 
-    if (isConnected == 0xFF) {
+    /*if (isConnected == 0xFF) {
         isConnected = 0x00;
         if (canSend == 0) {
             __delay_ms(3000);
@@ -94,8 +94,10 @@ void __attribute__((__interrupt__, __auto_psv__)) _ADC1Interrupt(void) {
             // __delay_ms(1000);
             canSend = 0;
         }
-    }
+    }*/
+    canSend = 1;
     if (canSend == 1) {
         ble_start();
+        __delay_us(600);
     }
 }

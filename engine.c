@@ -12,6 +12,7 @@
 #include "inputs.h"
 #include "headers.h"
 #include "bluetooth.h"
+#include "general.h"
 
 enum engine_phase {
     INIT,
@@ -278,9 +279,9 @@ void engine_start() {
     int i = 0;
     phase = RUN;
     
+    ble_config();
     // Réinitialisation du nom du bluetooth :
-    //ble_init();
-    perso(); // TEST reset + changement nom.
+    //perso(); // TEST reset + changement nom.
 
     timer_start();
 
@@ -295,7 +296,7 @@ void engine_start() {
     // Ajouts pour le timer de veille auto :
     int timerSleep = 0;
     //unsigned short valeursSleep [4];
-
+    
     while (phase == RUN) {
 
         average_update_weighted_averages();
@@ -463,23 +464,17 @@ void engine_splash() {
 }
 
 void engine_initialization() {
+    /*ble_config();
     extern int isConnected;
     extern int rxState;
-    extern int canSend;
+    extern int canSend;*/
 
     pwm_init();
-
-    isConnected = 0x00;
-    rxState = 0;
-    canSend = 0;
+    delay_ms(100);
     
-    //ble_init();
-    
+    //ble_config();
     //POWER_CIRCUIT_ENABLE = 1; // ALIMENTATION ENABLE
     //delay_ms(500);
-    
-    
-    //ble_init();
     
     engine_splash();
     // Initialization of the sleeping options
@@ -491,5 +486,19 @@ void engine_initialization() {
     averages_init();
     adc_init();
     lcd_clear_screen();
+    
+    /*
+    UARTWriteChar('A');
+    UARTWriteChar('T');
+    UARTWriteChar('+');
+    UARTWriteChar('S');
+    UARTWriteChar('T');
+    UARTWriteChar('A');
+    UARTWriteChar('R');
+    UARTWriteChar('T');
+    delay_ms(500);
+    ble_config();
+    */
+
     engine_start();
 }

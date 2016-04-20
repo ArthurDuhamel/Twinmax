@@ -1,7 +1,13 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <xc.h>
+#include "general.h"
 #include "bluetooth.h"
-#define FCY 16000000UL
 #include "inputs.h"
-#include "headers.h"
+
+
+#define FCY 16000000UL
+#include "libpic30.h"
 
 volatile UINT8_T value[9];
 volatile int packet_number;
@@ -60,12 +66,39 @@ void ble_start() {
     return;
 }
 
+void ble_config() {
+    initBTModule();
+
+    
+    ////uart setup///////
+    U1BRG = 0x0010;
+    U1MODE = 0b1000100000001000; //OK 
+    U1STA = 0b0010010100010000; //bit 15-13 = 01 : flag passe à 1 lorsque que le TSR est vide // Receviver not active
+    //U1STA = 0b0010010100000000; //Receive active
+    ////uart intertupt/////
+    IPC3bits.U1TXIP = 0b011; // priority = 3
+    IFS0bits.U1TXIF = 0; //interrupt has request
+    IEC0bits.U1TXIE = 1; // interrupt request are enabled 
+    
+    //Receiver
+    IPC2bits.U1RXIP = 0b011;
+    IFS0bits.U1RXIF = 0;//clear flag !
+    IEC0bits.U1RXIE = 1;
+    
+    ANSA = 0b0000000000000000;
+    ANSB = 0b0000000000000000;
+    //////////////////////
+}
+
 void UARTInit230400(void) {
     CLKDIV = 0x0000;
     //    TRISB = 0x0000;     // port B en sortie
 
     U1BRG = 0x0010; //pour mode fast
+
+
     U1MODE = 0b1000100000001000; //mode fast
+
     U1STA = 0b1000010100010000;
 
     /// timer/////
@@ -74,6 +107,7 @@ void UARTInit230400(void) {
     /// end timer////
 
     IFS0bits.T1IF = 0;
+
 }
 
 void UARTInit9600(void) {
@@ -93,12 +127,35 @@ void UARTInit9600(void) {
     /// end timer////
 
     IFS0bits.T1IF = 0;
+
 }
 
 void UARTBasicCommand() {
     UARTWriteChar('A');
     UARTWriteChar('T');
     UARTWriteChar('+');
+}
+
+void UARTWriteChar(char data) {
+    while (U1STAbits.UTXBF == 1) {
+    }
+    U1TXREG = data;
+}
+
+void UARTWriteByte(UINT8_T data) {
+    while (U1STAbits.UTXBF == 1) {
+    }
+    U1TXREG = data;
+}
+
+
+void UARTConfigBaudRate230400() {
+    UARTBasicCommand();
+    UARTWriteChar('B');
+    UARTWriteChar('A');
+    UARTWriteChar('U');
+    UARTWriteChar('D');
+    UARTWriteChar('9');
 }
 
 void UARTSetBTName() {
@@ -114,181 +171,94 @@ void UARTSetBTName() {
     UARTWriteChar('M');
     UARTWriteChar('a');
     UARTWriteChar('x');
-    UARTWriteChar('2');
-    //UARTWriteChar('0');
+
 }
 
-void UARTSetVerbose() {
+void UARTSetNotification() {
     UARTBasicCommand();
     UARTWriteChar('N');
     UARTWriteChar('O');
     UARTWriteChar('T');
     UARTWriteChar('I');
     UARTWriteChar('1');
-}
+} // notify when connected
 
-void UARTConfigBaudRate230400() {
+void UARTSetParity(){
     UARTBasicCommand();
-    UARTWriteChar('B');
-    UARTWriteChar('A');
-    UARTWriteChar('U');
-    UARTWriteChar('D');
-    UARTWriteChar('8');
-}
-
-void UARTSetADTypeIOSVal() {
-    UARTBasicCommand();
-    UARTWriteChar('A');
-    UARTWriteChar('D');
-    UARTWriteChar('V');
-    UARTWriteChar('I');
-    //UARTWriteChar('0');
-    UARTWriteChar('9');
-}
-
-void UARTSetParityBit() {
-    UARTBasicCommand();
-    UARTWriteChar('P');
-    UARTWriteChar('A');
-    UARTWriteChar('R');
-    UARTWriteChar('I');
+    UARTWriteChar('C');
+    UARTWriteChar('H');
+    UARTWriteChar('K');
     UARTWriteChar('0');
-}
+}// no parity
 
-void UARTSleep() {
+void UARTSetStopBit(){
     UARTBasicCommand();
     UARTWriteChar('S');
-    UARTWriteChar('L');
-    UARTWriteChar('E');
-    UARTWriteChar('E');
+    UARTWriteChar('T');
+    UARTWriteChar('O');
     UARTWriteChar('P');
-}
+    UARTWriteChar('0');
+} // one stop bit
+
+void UARTSetDisc(){
+    UARTBasicCommand();
+    UARTWriteChar('D');
+    UARTWriteChar('I');
+    UARTWriteChar('S');
+    UARTWriteChar('C');
+    UARTWriteChar('0');
+} // discoverable et connectable
 
 void UARTsetMode() {
     UARTBasicCommand();
-    UARTWriteChar('M');
-    UARTWriteChar('O');
-    UARTWriteChar('D');
+    UARTWriteChar('T');
+    UARTWriteChar('Y');
+    UARTWriteChar('P');
     UARTWriteChar('E');
     UARTWriteChar('0');
-}
+} // transmit mode
 
-void UARTsetPower() {
+void UARTResetBTModule() {
     UARTBasicCommand();
-    UARTWriteChar('P');
-    UARTWriteChar('O');
-    UARTWriteChar('W');
+    UARTWriteChar('D');
     UARTWriteChar('E');
-    UARTWriteChar('3');
-}
-
-void UARTRenewModule() {
-    UARTBasicCommand();
-    UARTWriteChar('R');
-    UARTWriteChar('E');
-    UARTWriteChar('N');
-    UARTWriteChar('E');
-    UARTWriteChar('W');
-}
-
-void UARTReliableAd() {
-    UARTBasicCommand();
-    UARTWriteChar('R');
-    UARTWriteChar('E');
+    UARTWriteChar('F');
+    UARTWriteChar('A');
+    UARTWriteChar('U');
     UARTWriteChar('L');
-    UARTWriteChar('I');
-    UARTWriteChar('1');
+    UARTWriteChar('T');
 }
 
-void UARTWakeUp() {
-    int i;
-    for (i = 0; i < 83; i++) {
-        UARTWriteChar('C');
-    }
-    UARTWriteChar('\0');
-}
-
-void UARTWriteChar(char data) {
-    while (U1STAbits.UTXBF == 1) {
-    }
-    U1TXREG = data;
-}
-
-void UARTWriteByte(UINT8_T data) {
-    while (U1STAbits.UTXBF == 1) {
-    }
-    U1TXREG = data;
-}
 
 //Set up UART at 9600 and wake up BT + set BT baud to 230400 then put the pic uart to 230400 and wake module again
 
-void perso() {
-    UARTWriteChar('A');
-    UARTWriteChar('T');
-    UARTWriteChar('+');
-    UARTWriteChar('R');
-    UARTWriteChar('E');
-    UARTWriteChar('S');
-    UARTWriteChar('E');
-    UARTWriteChar('T');
-    delay_ms(500);
-    UARTSetBTName();
-    delay_ms(100);
-}
-
 void initBTModule() {
     UARTInit230400();
-    UARTWakeUp();
-    __delay_ms(100);
-    UARTRenewModule();
+    UARTResetBTModule();
     __delay_ms(500);
     UARTInit9600();
-    UARTWakeUp();
-    __delay_ms(100);
-    UARTsetMode();
-    __delay_ms(100); // 100
+    UARTResetBTModule();
+    __delay_ms(500);
     UARTSetBTName();
-    __delay_ms(100); // 100
-    UARTSetADTypeIOSVal();
+    __delay_ms(700);
+    UARTsetMode();
     __delay_ms(100);
-    UARTSetVerbose();
+    UARTSetNotification(); 
     __delay_ms(100);
-    UARTsetPower();
+    UARTSetParity(); 
     __delay_ms(100);
-    UARTReliableAd();
+    UARTSetStopBit(); 
+    __delay_ms(100);
+    UARTSetDisc(); 
     __delay_ms(100);
     UARTConfigBaudRate230400();
     __delay_ms(100);
     UARTInit230400();
     __delay_ms(100);
-    if (U1STAbits.OERR == 1) {
+    if(U1STAbits.OERR == 1) {
         U1STAbits.OERR = 0;
     }
-    while (U1STAbits.URXDA == 1) {
+    while(U1STAbits.URXDA == 1) {
         U1TXREG = U1RXREG;
-    }
-}
-
-void ble_init() {
-    initBTModule();
-
-    ////uart setup///////
-    U1BRG = 0x0010;
-    U1MODE = 0b1000100000001000; //OK 
-    U1STA = 0b0010010100010000; //bit 15-13 = 01 : flag passe à 1 lorsque que le TSR est vide // Receiver not active
-    //U1STA = 0b0010010100000000; //Receive active
-
-    ////uart interrupt/////
-    IPC3bits.U1TXIP = 0b011; // priority = 3
-    IFS0bits.U1TXIF = 0; //interrupt has request
-    IEC0bits.U1TXIE = 1; // interrupt request are enabled 
-
-    //Receiver
-    IPC2bits.U1RXIP = 0b011;
-    IFS0bits.U1RXIF = 0; //clear flag !
-    IEC0bits.U1RXIE = 1;
-
-    //ANSA = 0b0000000000000000;
-    //ANSB = 0b0000000000000000;
-    //////////////////////
+    } 
 }

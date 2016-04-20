@@ -8,6 +8,7 @@
 #include "headers.h"
 #include "inputs.h"
 #include "bluetooth.h"
+#include "general.h"
 
 // PIC24FV16KM204 Configuration Bit Settings
 
@@ -69,12 +70,24 @@ volatile int rxState;
 volatile int canSend;
 
 int main(void) {
-    isConnected = 0x00;
-    CLKDIV = 0; // No clock prescaler
-    
     POWER_CIRCUIT_ENABLE = 1;
     delay_ms(500);
-    //ble_init();
+    
+    isConnected = 0x00;
+    CLKDIV = 0x0000;
+    
+    /*
+    UARTWriteChar('A');
+    UARTWriteChar('T');
+    UARTWriteChar('+');
+    UARTWriteChar('S');
+    UARTWriteChar('T');
+    UARTWriteChar('A');
+    UARTWriteChar('R');
+    UARTWriteChar('T');
+    delay_ms(500);
+    */
+    //ble_config();
     
     if (is_offset_set != 1) {
         int i = 0;
@@ -93,10 +106,6 @@ int main(void) {
     TRISA = 0b0000110001111111;
     TRISB = 0b1111001000000000;
     TRISC = 0b0000000001000011;
-    
-    //POWER_CIRCUIT_ENABLE = 1; //ALIMENTATION ENABLE
-    //delay_ms(500);
-    ble_init();
     
     engine_initialization();
     return 1;
