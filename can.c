@@ -98,6 +98,6 @@ void __attribute__((__interrupt__, __auto_psv__)) _ADC1Interrupt(void) {
     canSend = 1;
     if (canSend == 1) {
         ble_start();
-        __delay_us(600);
     }
+    IFS0bits.U1TXIF=0b0;// remise à 0 du flag
 }

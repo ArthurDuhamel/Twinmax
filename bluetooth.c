@@ -197,7 +197,7 @@ void UARTSetStopBit(){
     UARTWriteChar('T');
     UARTWriteChar('O');
     UARTWriteChar('P');
-    UARTWriteChar('0');
+    UARTWriteChar('1');
 } // one stop bit
 
 void UARTSetDisc(){
@@ -241,16 +241,16 @@ void initBTModule() {
     __delay_ms(500);
     UARTSetBTName();
     __delay_ms(700);
-    UARTsetMode();
-    __delay_ms(100);
+    //UARTsetMode();
+    //__delay_ms(100);
     UARTSetNotification(); 
     __delay_ms(100);
-    UARTSetParity(); 
-    __delay_ms(100);
-    UARTSetStopBit(); 
-    __delay_ms(100);
-    UARTSetDisc(); 
-    __delay_ms(100);
+    //UARTSetParity(); 
+    //__delay_ms(100);
+    //UARTSetStopBit(); 
+    //__delay_ms(100);
+    //UARTSetDisc(); 
+    //__delay_ms(100);
     UARTConfigBaudRate230400();
     __delay_ms(100);
     UARTInit230400();
