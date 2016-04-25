@@ -207,7 +207,9 @@ void button_select_interupt() {
     extern unsigned short reference_sensor;
     extern unsigned short weightedAverages[4];
     extern unsigned short pression_range;
+    extern unsigned short reveil;
     set_scale(weightedAverages[reference_sensor], pression_range);
+    reveil = 1;
     delay_ms(200);
     return;
 }
@@ -216,7 +218,9 @@ void button_right_interupt() {
     extern unsigned short reference_sensor;
     extern unsigned short weightedAverages[4];
     extern unsigned short pression_range;
+    extern unsigned short reveil;
     set_scale(weightedAverages[reference_sensor], pression_range / RANGE_STEP);
+    reveil = 1;
     delay_ms(200);
     return;
 }
@@ -225,7 +229,9 @@ void button_left_interupt() {
     extern unsigned short reference_sensor;
     extern unsigned short weightedAverages[4];
     extern unsigned short pression_range;
+    extern unsigned short reveil;
     set_scale(weightedAverages[reference_sensor], pression_range * RANGE_STEP);
+    reveil = 1;
     delay_ms(200);
     return;
 }
@@ -276,6 +282,8 @@ void engine_start() {
     extern int sensor_offsets[4];
     pression_range = MAX_RANGE;
     unsigned short vals[4];
+    extern unsigned short reveil;
+    
     int i = 0;
     phase = RUN;
     
@@ -313,6 +321,10 @@ void engine_start() {
         // Automatic sleep mode if the TwinMax is idle for a while (at atmospheric pressure)
         if ((weightedAverages[0] < 2300) && (weightedAverages[0] > 2000) && (weightedAverages[1] < 2300) && (weightedAverages[1] > 2000) && (weightedAverages[2] < 2300) && (weightedAverages[2] > 2000) && (weightedAverages[3] < 2300) && (weightedAverages[3] > 2000)) {
             timerSleep++;
+            if (reveil == 1) {
+                timerSleep = 0;
+                reveil = 0;
+            }
             if (timerSleep > 3000) {
                 button_power_interupt();
             }
